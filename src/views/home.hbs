@@ -1,0 +1,76 @@
+<div class="wrapper" id="main-wrapper">
+  {{#each data}}
+  <div class="albums">
+    <div class="img-album">
+      <img src="https://www.pinkvilla.com{{this.node.field_photo_image_section}}" alt="" />
+    </div>
+    <div class="album-info">
+      <p class="album-body">
+        {{this.node.title}}
+      </p>
+    </div>
+  </div>
+  {{/each}}
+</div>
+
+<div class="loader">
+  <div class="circle"></div>
+  <div class="circle"></div>
+</div>
+
+<script>
+  let page = 2
+  const loading = document.querySelector(".loader");
+  const mainWrapper = document.getElementById("main-wrapper");
+  async function getPhotos() {
+    const response = await fetch(
+      `https://073i2.sse.codesandbox.io/nextPage/${page}`
+    );
+    const data = await response.json();
+    console.log(data);
+    return data;
+  }
+
+
+  async function showPhotos() {
+    const pages = await getPhotos();
+    pages.forEach((page) => {
+      const photoElement = document.createElement("div");
+      photoElement.classList.add("albums");
+      photoElement.innerHTML = `
+    <div class="img-album">
+      <img
+        src=http://www.pinkvilla.com/${page.node.field_photo_image_section}
+        alt=""
+      />
+    </div>
+    <div class="album-info">
+      <p class="album-body">
+      ${page.node.title}
+      </p>
+    </div>`;
+      mainWrapper.appendChild(photoElement);
+    });
+  }
+
+  function showLoading() {
+    loading.classList.add("show");
+
+    setTimeout(() => {
+      loading.classList.remove("show");
+
+      setTimeout(() => {
+        page++;
+        showPhotos();
+      }, 1500);
+    }, 1000);
+  }
+  window.addEventListener("scroll", () => {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+    if (scrollTop + clientHeight >= scrollHeight - 6) {
+      showLoading();
+    }
+  });
+
+</script>
